@@ -16,41 +16,46 @@ app = Flask(__name__)
 bot = Bot(token=TOKEN)
 
 def create_plisio_invoice(amount, network, user_id):
-    # تحديد العملة والشبكة
+    # التأكد من اسم الشبكة
     full_currency = "USDT_BSC" if "BEP20" in str(network) else "USDT_TRX"
+    
+    # الرابط يجب أن يكون كاملاً وصحيحاً
     url = "https://plisio.net"
     
+    # تحويل كل القيم لنصوص (Strings) لتجنب أخطاء السيرفر
     params = {
-        'api_key': API_KEY,
-        'currency': full_currency,
-        'order_number': f"{user_id}_{int(time.time())}",
-        'order_name': 'VIP_Sub',
+        'api_key': str(API_KEY).strip(),
+        'currency': str(full_currency),
+        'order_number': str(user_id) + "_" + str(int(time.time())),
+        'order_name': 'VIP_Subscription',
         'amount': str(amount),
-        'callback_url': f"https://railway.app",
-        'expire_time': 900
+        'callback_url': "https://railway.app",
+        'expire_time': "900"
     }
     
     try:
-        response = requests.get(url, params=params, timeout=15)
+        # أضفنا Headers لكي يظن بليسيو أن الطلب قادم من متصفح حقيقي (لتجنب الحظر)
+        headers = {'User-Agent': 'Mozilla/5.0'}
+        response = requests.get(url, params=params, headers=headers, timeout=20)
+        
+        # إذا كان الرد فارغاً أو خطأ 404
+        if not response.text:
+            print("--- خطأ: رد بليسيو فارغ تماماً ---")
+            return None
+            
         data = response.json()
-        
-        # طباعة الرد في الـ Logs لنعرف لماذا عاد الخطأ
-        print(f"--- Plisio Response: {data} ---")
-        
         if data.get('status') == 'success':
-            # سحب البيانات المطلوبة
             return {
                 'address': data['data'].get('wallet_hash'),
                 'amount': data['data'].get('amount'),
                 'url': data['data'].get('invoice_url')
             }
         else:
+            print(f"--- رفض بليسيو الطلب: {data} ---")
             return None
     except Exception as e:
-        print(f"--- Request Error: {e} ---")
+        print(f"--- خطأ تقني في الاتصال: {e} ---")
         return None
-
-
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
