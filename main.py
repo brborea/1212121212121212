@@ -16,6 +16,7 @@ app = Flask(__name__)
 bot = Bot(token=TOKEN)
 
 def create_plisio_invoice(amount, network, user_id):
+    # تحديد العملة والشبكة
     full_currency = "USDT_BSC" if "BEP20" in str(network) else "USDT_TRX"
     url = "https://plisio.net"
     
@@ -32,16 +33,23 @@ def create_plisio_invoice(amount, network, user_id):
     try:
         response = requests.get(url, params=params, timeout=15)
         data = response.json()
+        
+        # طباعة الرد في الـ Logs لنعرف لماذا عاد الخطأ
+        print(f"--- Plisio Response: {data} ---")
+        
         if data.get('status') == 'success':
-            # نرسل العنوان والمبلغ والرابط كقائمة
+            # سحب البيانات المطلوبة
             return {
-                'address': data['data']['wallet_hash'],
-                'amount': data['data']['amount'],
-                'url': data['data']['invoice_url']
+                'address': data['data'].get('wallet_hash'),
+                'amount': data['data'].get('amount'),
+                'url': data['data'].get('invoice_url')
             }
+        else:
+            return None
+    except Exception as e:
+        print(f"--- Request Error: {e} ---")
         return None
-    except:
-        return None
+
 
 
 
