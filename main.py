@@ -16,33 +16,33 @@ app = Flask(__name__)
 bot = Bot(token=TOKEN)
 
 def create_plisio_invoice(amount, network, user_id):
-    full_currency = "USDT_BSC" if network == "BEP20" else "USDT_TRX"
-    url = "https://api.plisio.net/api/v1/invoices/new"
+    full_currency = "USDT_BSC" if "BEP20" in str(network) else "USDT_TRX"
+    url = "https://plisio.net"
+    
     params = {
         'api_key': API_KEY,
         'currency': full_currency,
         'order_number': f"{user_id}_{int(time.time())}",
-        'order_name': 'VIP_Subscription',
+        'order_name': 'VIP_Sub',
         'amount': str(amount),
-        'callback_url': f"https://{os.getenv('RAILWAY_STATIC_URL')}/webhook",
+        'callback_url': f"https://railway.app",
         'expire_time': 900
     }
+    
     try:
         response = requests.get(url, params=params, timeout=15)
         data = response.json()
-        
-        # نكتفي بهذا الشرط لإرجاع الرابط للمشترك
         if data.get('status') == 'success':
-            return data['data']['invoice_url']
-        else:
-            return None
-    except Exception as e:
-        print(f"Error: {e}")
+            # نرسل العنوان والمبلغ والرابط كقائمة
+            return {
+                'address': data['data']['wallet_hash'],
+                'amount': data['data']['amount'],
+                'url': data['data']['invoice_url']
+            }
+        return None
+    except:
         return None
 
-    except Exception as e:
-        print(f"--- خطأ في الكود نفسه: {e} ---")
-        return None
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
