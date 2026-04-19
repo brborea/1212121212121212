@@ -21,24 +21,25 @@ def create_plisio_invoice(amount, network, user_id):
     params = {
         'api_key': API_KEY,
         'currency': full_currency,
-        'network': ps_network,
         'order_number': f"{user_id}_{int(time.time())}",
-        'order_name': 'VIP_Sub',
+        'order_name': 'VIP_Subscription',
         'amount': str(amount),
         'callback_url': f"https://{os.getenv('RAILWAY_STATIC_URL')}/webhook",
         'expire_time': 900
     }
     try:
         response = requests.get(url, params=params, timeout=15)
-        # السطرين القادمين هما "كاشف الأعطال"
-        print(f"--- كود حالة الرد من بليسيو: {response.status_code} ---")
-        print(f"--- نص الرد الكامل من بليسيو: {response.text} ---")
-        
         data = response.json()
+        
+        # نكتفي بهذا الشرط لإرجاع الرابط للمشترك
         if data.get('status') == 'success':
             return data['data']['invoice_url']
         else:
             return None
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
+
     except Exception as e:
         print(f"--- خطأ في الكود نفسه: {e} ---")
         return None
