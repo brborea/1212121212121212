@@ -16,11 +16,11 @@ app = Flask(__name__)
 bot = Bot(token=TOKEN)
 
 def create_plisio_invoice(amount, network, user_id):
-    ps_network = "USDT_BSC" if network == "BEP20" else "USDT_TRC20"
+    full_currency = "USDT_BSC" if network == "BEP20" else "USDT_TRX"
     url = "https://api.plisio.net/api/v1/invoices/new"
     params = {
         'api_key': API_KEY,
-        'currency': 'USDT',
+        'currency': full_currency,
         'network': ps_network,
         'order_number': f"{user_id}_{int(time.time())}",
         'order_name': 'VIP_Sub',
