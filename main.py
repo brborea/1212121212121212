@@ -17,7 +17,7 @@ bot = Bot(token=TOKEN)
 
 def create_plisio_invoice(amount, network, user_id):
     ps_network = "USDT_BSC" if network == "BEP20" else "USDT_TRX"
-    url = "https://plisio.net/api/v1/queries/create-invoice"
+    url = "https://api.plisio.net/api/v1/invoices/new"
     params = {
         'api_key': API_KEY,
         'currency': 'USDT',
