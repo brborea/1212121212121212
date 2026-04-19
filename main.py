@@ -9,7 +9,7 @@ import threading
 # جلب البيانات من إعدادات ريلوي (Variables)
 TOKEN = "8246397533:AAHNbVpRh2NcCViZXBjlPyJMkTHk6iijFJI"
 ADMIN_ID = "6712633269"
-API_KEY = MnbbxvIVH7c3sCjoFkvcsPjucFq6L19n_10sKWodpNV6Y9YWk2DbO8vC1oxE4NOL 
+API_KEY = "MnbbxvIVH7c3sCjoFkvcsPjucFq6L19n_10sKWodpNV6Y9YWk2DbO8vC1oxE4NOL" 
 CHANNEL_LINK = "https://t.me/+rFgu03v83t1mNTdk"
 
 app = Flask(__name__)
