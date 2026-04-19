@@ -29,10 +29,20 @@ def create_plisio_invoice(amount, network, user_id):
         'expire_time': 900
     }
     try:
-        response = requests.get(url, params=params)
-        return response.json()['data']['invoice_url']
-    except:
+        response = requests.get(url, params=params, timeout=15)
+        # السطرين القادمين هما "كاشف الأعطال"
+        print(f"--- كود حالة الرد من بليسيو: {response.status_code} ---")
+        print(f"--- نص الرد الكامل من بليسيو: {response.text} ---")
+        
+        data = response.json()
+        if data.get('status') == 'success':
+            return data['data']['invoice_url']
+        else:
+            return None
+    except Exception as e:
+        print(f"--- خطأ في الكود نفسه: {e} ---")
         return None
+
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [[InlineKeyboardButton("شام كاش (يدوي)", callback_data="pay_sham")],
